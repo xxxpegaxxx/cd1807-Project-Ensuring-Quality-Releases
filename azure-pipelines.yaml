@@ -178,9 +178,9 @@ stages:
 
 #--------------------------------------------#  
 # DEPLOYMENT STAGE
-#--------------------------------------------#    
+#--------------------------------------------#
 - stage: Deploy
-  jobs:
+jobs:
   #--------------------------------------------#  
   # Deploy FakeRestAPI Web App
   # ToDo: Provide <environment name> you created in your DevOps project
