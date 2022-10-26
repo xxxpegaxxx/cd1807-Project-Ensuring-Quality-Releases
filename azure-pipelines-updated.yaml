@@ -188,7 +188,7 @@ stages:
   - deployment: FakeRestAPI
     pool:
       vmImage: 'Ubuntu-latest'      
-    environment: project3_env   # ToDo
+    environment: 'project3_env'   # ToDo
     strategy:
       runOnce:
         deploy:
