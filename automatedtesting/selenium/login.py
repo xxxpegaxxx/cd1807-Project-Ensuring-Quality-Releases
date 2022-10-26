@@ -26,6 +26,7 @@ print ('Password has been inserted.')
 driver.find_element(By.CSS_SELECTOR,"input[id='password']").send_keys(password)
 print ('Login button has been pressed.')
 driver.find_element(By.CSS_SELECTOR,"input[id='login-button']").click()
+print ('The following account "' + user + '" has successfully logged in to the site.')
 
 print ('Sauce Labs Backpack has been added to the cart.')
 driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_primary btn_small btn_inventory']").click()
