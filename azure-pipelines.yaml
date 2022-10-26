@@ -4,7 +4,7 @@ name: Azure Pipelines
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
 trigger:
-- none
+- main
 
 # ToDo: Replace the agent pool name, if you are using Udacity Cloud lab. 
 # Otherwise, comment out the line below. 
@@ -99,7 +99,7 @@ stages:
     - task: CmdLine@2
       displayName: Install Newman
       inputs:
-        script: 'sudo npm install -g newman'
+        script: 'sudo npm install -g newman'          # ToDo: Write your commands to install newman
         workingDirectory: $(System.DefaultWorkingDirectory)
     - task: CmdLine@2
       displayName: Install Newman Reporter
@@ -112,25 +112,26 @@ stages:
       displayName: Run Data Validation Tests
       continueOnError: true
       inputs:
-        script: newman run Data_Validation_Suite.postman_collection.json -e Testing.postman_environment.json -r cli,junitfull --reporter-junitfull-export JUnitReport-data-validation.xml
-        workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
+        script: newman run Data_Validation_Suite.postman_collection.json -e Testing.postman_environment.json -r cli,junitfull --reporter-junitfull-export TEST-JUnitReport-data-validation.xml          # ToDo: Write your commands
+        workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'    
     # Postman Regression Test Suite    
     # ToDo: Update the command and verify the working directory
     - task: CmdLine@2
       displayName: Run Regression Tests
       continueOnError: true
       inputs:
-        script: newman run Regression_Test_Suite.postman_collection.json -e Testing.postman_environment.json -r cli,junitfull --reporter-junitfull-export JUnitReport-regression-test.xml
+        script: newman run Regression_Test_Suite.postman_collection.json -e Testing.postman_environment.json -r cli,junitfull --reporter-junitfull-export TEST-JUnitReport-regression-test.xml          # ToDo: Write your commands
         workingDirectory: '$(System.DefaultWorkingDirectory)/automatedtesting/postman'
     # Postman - Publish Results 
     # ToDo: Complete the task as explained here: https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/test/publish-test-results?view=azure-devops&tabs=trx%2Cyaml#yaml-snippet
     - task: PublishTestResults@2
       inputs:
         testResultsFormat: 'JUnit'
-        testResultsFiles: '*/JUnitReport-*.xml'
-    #    searchFolder:       # ToDo
+        testResultsFiles: '**/TEST-*.xml'
+        searchFolder:       # ToDo
         mergeTestResults: true
-        testRunTitle: 'Publish postman test result'
+        testRunTitle: 'Publish postman test result'      # ToDo
+
     #--------------------------------------------#
     # Selenium (UI) Test Suite - Archive the package  
     # "ArchiveFiles@2" picks up the web package and archives it.
@@ -173,20 +174,20 @@ stages:
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-performancetestsuite.zip'
     # JMeter Test Suite - Publish    
     - publish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-performancetestsuite.zip'
-      displayName: 'Upload Performance Test Suite
+      displayName: 'Upload Jmeter Performance Test Suite'
       artifact: drop-performancetestsuite
 
 #--------------------------------------------#  
 # DEPLOYMENT STAGE
-#--------------------------------------------#
+#--------------------------------------------#    
 - stage: Deploy
   jobs:
   #--------------------------------------------#  
   # Deploy FakeRestAPI Web App
   # ToDo: Provide <environment name> you created in your DevOps project
   - deployment: FakeRestAPI
-    pool:
-      vmImage: 'Ubuntu-18.04'
+    pool:        
+      vmImage: 'Ubuntu-latest'      
     environment: project3_env   # ToDo
     strategy:
       runOnce:
@@ -195,53 +196,129 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy Azure Web App'
             inputs:
-              azureSubscription:      # ToDo
-              appName: MyFakeStore               # ToDo
+              azureSubscription: $(azureServiceConnectionId)      # ToDo
+              appName: FakeRestAPI              # ToDo
               appType: webApp
-              package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-performancetestsuite.zip       # ToDo: Use the published zip artifact.
-              #package: $(Pipeline.Workspace)/<artifact>/<archiveFile>       # ToDo: Use the published zip artifact.
+              package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-fakerestapi.zip     # ToDo: Use the published zip artifact. 
           #--------------------------------------------#    
           # Run JMeter test suite against the App Service
           # ToDo: Update the script below to install jmeter, unzip the jmeter test suite published zip artifact, and run the PerformanceTestSuite.  
           # ToDo: Generate the log file. 
-  #        - task: CmdLine@2
-  #          inputs:
-  #            script: |
+          - task: CmdLine@2
+            inputs:
+              script: |
                                                                             # ToDo: Write your commands
-   #           workingDirectory: $(Pipeline.Workspace)/<artifact>            # ToDo: Use the artifact name from the task above
+              workingDirectory: $(Pipeline.Workspace)/<artifact>            # ToDo: Use the artifact name from the task above
               
   #--------------------------------------------#  
   # Selenium | Functional UI Tests
   # ToDo: 
-  #- deployment: VMDeploy
-  #  displayName: Selenium Tests
-  #  environment:
-  #    name: InsertNameHere        # ToDo: Change/provide a name
-  #    resourceType: VirtualMachine
-  #    tags: selenium
-  #  strategy:
-  #    runOnce:
-  #      deploy:
-  #        steps:
-  #        - download: current
-  #          artifact: drop-ui-tests     # ToDo: Change/provide a name
+  - deployment: VMDeploy
+    displayName: Selenium Tests
+    environment:
+      name: 'test'
+      resourceType: VirtualMachine
+      tags: selenium
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: drop-ui-tests     # ToDo: Change/provide a name
             
-  #        - task: Bash@3
-  #          inputs:
-  #            targetType: 'inline'
-  #            script: |           
-  #              # ToDo: Install Selenium, Chromium-browser & Chromedriver, if not already in the custom VM image. 
-  #              #! /bin/bash
-  #              
-  #              sudo apt-get upgrade -y
-  #              sudo apt-get install python3-pip -y
-  #              sudo apt-get install unzip -y
-  #              sudo apt-get install -y chromium-browser
-  #              pip3 install selenium
+          - task: Bash@3
+            inputs:
+              targetType: 'inline'
+              script: |           
+                # ToDo: Install Selenium, Chromium-browser & Chromedriver, if not already in the custom VM image. 
+                #! /bin/bash
+                
+                sudo apt-get upgrade -y
+                sudo apt-get install python3-pip -y
+                sudo apt-get install unzip -y
+                sudo apt-get install -y chromium-browser
+                pip3 install selenium
                 
                 #  ToDo: Add chromedriver executable to path
-   #             export PATH=$PATH:/path/to/chromedriver     
+                export PATH=$PATH:/path/to/chromedriver     
                 
                 # ToDo: Write commands for deploying the UI Test Suite (published zip artifact) to the linux VM and execute the Test Suite
                 # ToDo: Direct the output of the Selenium Test Suite to a log file
                 
+          - task: Bash@3
+            displayName: Run UI test
+            inputs:
+              targetType: 'inline'
+              script: |
+                unzip -o $(Pipeline.Workspace)/drop-uitests/$(Build.BuildId)-uitests.zip -d ./
+                mkdir -p ./log/selenium
+                python3 ./login.py 2>&1 | tee -a ./log/selenium/selenium-test-suite.log
+                ls -al
+          - task: PublishPipelineArtifact@1
+            displayName: Selenium Logs
+            inputs:
+              targetPath: '$(System.DefaultWorkingDirectory)/log/selenium/selenium-test-suite.log'
+              artifact: drop-selenium-logs
+              publishLocation: 'pipeline'
+                
+#--------------------------------------------#  
+# TESTING STAGE
+#--------------------------------------------#  
+- stage: Test
+  jobs:
+  - job: PerformanceTest
+    displayName: JMeter Testing
+    steps:
+        - bash: |
+            sudo apt-get update -y
+            sudo apt-get install default-jre-headless -y
+            java -version
+            if ! command -v apache-jmeter-5.5/bin/jmeter &> /dev/null
+            then
+              curl -O https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.5.tgz
+              tar xzvf apache-jmeter-5.5.tgz
+            fi
+            mkdir -p testing/jmeter
+          displayName: JMeter Installation
+        - bash: |
+            apache-jmeter-5.5/bin/jmeter -n -t automatedtesting/jmeter/Stress_Test.jmx \
+                                        -l testing/jmeter/stress-test-results.csv \
+                                        -e -f -o testing/jmeter \
+                                        -j testing/jmeter/stress-test.log
+          displayName: Stress Test
+        
+        - task: ArchiveFiles@2
+          displayName: Publishing Stress Test
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/testing/jmeter'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-jmeter-stress-test.zip'
+            verbose: true
+            
+        - task: PublishPipelineArtifact@1
+          displayName: Publishing Stress Test Logs
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-jmeter-stress-test.zip'
+            artifactName: 'drop-stress-test-logs'
+
+        - bash: |
+            apache-jmeter-5.5/bin/jmeter -n -t automatedtesting/jmeter/Endurance_Test.jmx \
+                                        -l testing/jmeter/endurance-test-results.csv \
+                                        -e -f -o testing/jmeter \
+                                        -j testing/jmeter/endurance-test.log
+          displayName: JMeter Endurance Test
+        - task: ArchiveFiles@2
+          displayName: Publishing Endurance Test
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/testing/jmeter'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-jmeter-endurance-test.zip'
+            verbose: true
+
+        - task: PublishPipelineArtifact@1
+          displayName: Publishing Endurance Test Logs
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-jmeter-endurance-test.zip'
+            artifactName: 'drop-endurance-test-logs'
