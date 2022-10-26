@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 
 
 # Start the browser and login with standard_user
-#def login (user, password, url):
+
 print ('Starting the browser...')
     # --uncomment when running in Azure DevOps.
     # options = ChromeOptions()
@@ -27,17 +27,39 @@ driver.find_element(By.CSS_SELECTOR,"input[id='password']").send_keys(password)
 print ('Login button has been pressed.')
 driver.find_element(By.CSS_SELECTOR,"input[id='login-button']").click()
 
+print ('Sauce Labs Backpack has been added to the cart.')
 driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_primary btn_small btn_inventory']").click()
+print ('Sauce Labs Bike Light has been added to the cart.')
 driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_primary btn_small btn_inventory']").click()
+print ('Sauce Labs Bolt T-Shirt has been added to the cart.')
 driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_primary btn_small btn_inventory']").click()
+print ('Sauce Labs Fleece Jacket has been added to the cart.')
 driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_primary btn_small btn_inventory']").click()
+print ('Sauce Labs Onesie has been added to the cart.')
 driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_primary btn_small btn_inventory']").click()
+print ('Test.allTheThings() T-Shirt (Red) has been added to the cart.')
 driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_primary btn_small btn_inventory']").click()
 
 no_cart_items = driver.find_element(By.CSS_SELECTOR,"div[id='shopping_cart_container'] > a > span.shopping_cart_badge").text
-print ("There are " + no_cart_items + " items in the shopping cart")
-driver.find_element(By.CSS_SELECTOR,"input[id='shopping_cart_link']").click()
+print ("There are " + no_cart_items + " items in the shopping cart.")
 
-time.wait(10)
-#login('standard_user', 'secret_sauce', 'https://www.saucedemo.com/')
+print ('Sauce Labs Backpack has been removed from to the cart.')
+driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_secondary btn_small btn_inventory']").click()
+print ('Sauce Labs Bike Light has been removed from to the cart.')
+driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_secondary btn_small btn_inventory']").click()
+print ('Sauce Labs Bolt T-Shirt has been removed from to the cart.')
+driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_secondary btn_small btn_inventory']").click()
+print ('Sauce Labs Fleece Jacket has been removed from to the cart.')
+driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_secondary btn_small btn_inventory']").click()
+print ('Sauce Labs Onesie has been removed from to the cart.')
+driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_secondary btn_small btn_inventory']").click()
+print ('Test.allTheThings() T-Shirt (Red) has been removed from to the cart.')
+driver.find_element(By.CSS_SELECTOR,"button[class='btn btn_secondary btn_small btn_inventory']").click()
 
+if '>0' in no_cart_items:
+    print ("There are " + no_cart_items + " items in the shopping cart.")
+else:
+    print ("Shopping cart is currently empty")
+
+print ("The Sauce Demo website has been closed!")
+driver.close()
