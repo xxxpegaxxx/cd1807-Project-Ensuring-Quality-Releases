@@ -174,7 +174,7 @@ stages:
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-performancetestsuite.zip'
     # JMeter Test Suite - Publish    
     - publish: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-performancetestsuite.zip'
-      displayName: 'Upload Performance Test Suite'
+      displayName: 'Upload Jmeter Performance Test Suite'
       artifact: drop-performancetestsuite
 
 #--------------------------------------------#  
@@ -196,10 +196,10 @@ stages:
           - task: AzureWebApp@1
             displayName: 'Deploy Azure Web App'
             inputs:
-              azureSubscription:      # ToDo
+              azureSubscription: $(azureServiceConnectionId)      # ToDo
               appName: MyFakeStore               # ToDo
               appType: webApp
-              package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-performancetestsuite.zip     # ToDo: Use the published zip artifact. 
+              package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-fakerestapi.zip     # ToDo: Use the published zip artifact. 
           #--------------------------------------------#    
           # Run JMeter test suite against the App Service
           # ToDo: Update the script below to install jmeter, unzip the jmeter test suite published zip artifact, and run the PerformanceTestSuite.  
@@ -244,4 +244,20 @@ stages:
                 
                 # ToDo: Write commands for deploying the UI Test Suite (published zip artifact) to the linux VM and execute the Test Suite
                 # ToDo: Direct the output of the Selenium Test Suite to a log file
+                
+          - task: Bash@3
+            displayName: Run UI test
+            inputs:
+              targetType: 'inline'
+              script: |
+                unzip -o $(Pipeline.Workspace)/drop-uitests/$(Build.BuildId)-uitests.zip -d ./
+                mkdir -p ./log/selenium
+                python3 ./login.py 2>&1 | tee -a ./log/selenium/selenium-test-suite.log
+                ls -al
+          - task: PublishPipelineArtifact@1
+            displayName: Selenium Logs
+            inputs:
+              targetPath: '$(System.DefaultWorkingDirectory)/log/selenium/selenium-test-suite.log'
+              artifact: drop-selenium-logs
+              publishLocation: 'pipeline'
                 
