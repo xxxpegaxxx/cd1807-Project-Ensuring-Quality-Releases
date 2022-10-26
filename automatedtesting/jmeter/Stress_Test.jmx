@@ -101,7 +101,7 @@
           <collectionProp name="Arguments.arguments">
             <elementProp name="ServerName" elementType="Argument">
               <stringProp name="Argument.name">ServerName</stringProp>
-              <stringProp name="Argument.value">jsonplaceholder.typicode.com</stringProp>
+              <stringProp name="Argument.value">fakerestapi-appservice.azurewebsites.net</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
           </collectionProp>
