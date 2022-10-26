@@ -197,7 +197,7 @@ stages:
             displayName: 'Deploy Azure Web App'
             inputs:
               azureSubscription: $(azureServiceConnectionId)      # ToDo
-              appName: MyFakeStore               # ToDo
+              appName: FakeRestAPI              # ToDo
               appType: webApp
               package: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-fakerestapi.zip     # ToDo: Use the published zip artifact. 
           #--------------------------------------------#    
@@ -261,3 +261,64 @@ stages:
               artifact: drop-selenium-logs
               publishLocation: 'pipeline'
                 
+#--------------------------------------------#  
+# TESTING STAGE
+#--------------------------------------------#  
+- stage: Test
+  jobs:
+  - job: PerformanceTest
+    displayName: JMeter Testing
+    steps:
+        - bash: |
+            sudo apt-get update -y
+            sudo apt-get install default-jre-headless -y
+            java -version
+            if ! command -v apache-jmeter-5.5/bin/jmeter &> /dev/null
+            then
+              curl -O https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.5.tgz
+              tar xzvf apache-jmeter-5.5.tgz
+            fi
+            mkdir -p testing/jmeter
+          displayName: JMeter Installation
+        - bash: |
+            apache-jmeter-5.5/bin/jmeter -n -t automatedtesting/jmeter/Stress_Test.jmx \
+                                        -l testing/jmeter/stress-test-results.csv \
+                                        -e -f -o testing/jmeter \
+                                        -j testing/jmeter/stress-test.log
+          displayName: Stress Test
+        
+        - task: ArchiveFiles@2
+          displayName: Publishing Stress Test
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/testing/jmeter'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-jmeter-stress-test.zip'
+            verbose: true
+            
+        - task: PublishPipelineArtifact@1
+          displayName: Publishing Stress Test Logs
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-jmeter-stress-test.zip'
+            artifactName: 'drop-stress-test-logs'
+
+        - bash: |
+            apache-jmeter-5.5/bin/jmeter -n -t automatedtesting/jmeter/Endurance_Test.jmx \
+                                        -l testing/jmeter/endurance-test-results.csv \
+                                        -e -f -o testing/jmeter \
+                                        -j testing/jmeter/endurance-test.log
+          displayName: JMeter Endurance Test
+        - task: ArchiveFiles@2
+          displayName: Publishing Endurance Test
+          inputs:
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/testing/jmeter'
+            includeRootFolder: false
+            archiveType: 'zip'
+            archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-jmeter-endurance-test.zip'
+            verbose: true
+
+        - task: PublishPipelineArtifact@1
+          displayName: Publishing Endurance Test Logs
+          inputs:
+            targetPath: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId)-jmeter-endurance-test.zip'
+            artifactName: 'drop-endurance-test-logs'
