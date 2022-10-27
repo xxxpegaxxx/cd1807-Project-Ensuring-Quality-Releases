@@ -218,7 +218,6 @@ stages:
     environment:
       name: project3_env
       resourceType: VirtualMachine
-      #tags: selenium
     strategy:
       runOnce:
         deploy:
