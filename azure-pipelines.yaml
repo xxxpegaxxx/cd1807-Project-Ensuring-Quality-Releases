@@ -223,8 +223,7 @@ stages:
         deploy:
           steps:
           - download: current
-            artifact: drop-ui-tests     # ToDo: Change/provide a name
-            path: $(Pipeline.Workspace)
+            artifact: $(Pipeline.Workspace)/drop-ui-tests     # ToDo: Change/provide a name
             
           - task: Bash@3
             inputs:
