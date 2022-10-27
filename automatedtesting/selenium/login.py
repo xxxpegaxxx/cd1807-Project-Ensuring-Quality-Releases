@@ -17,7 +17,8 @@ options.add_argument("start-maximized")
 options.add_argument("disable-infobars")
 options.add_argument("--disable-extensions")
 options.add_argument("--disable-gpu")
-driver = webdriver.Chrome(options=options)
+driver = webdriver.Chrome('/path to ... /chromedriver',chrome_options=chrome_options)
+#driver = webdriver.Chrome(options=options)
 
 user = 'standard_user'
 password = 'secret_sauce'
