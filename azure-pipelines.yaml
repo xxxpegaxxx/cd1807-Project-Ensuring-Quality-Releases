@@ -223,7 +223,6 @@ stages:
         deploy:
           steps:
           - download: current
-            artifact: $(Pipeline.Workspace)/drop-fakerestapi/$(Build.BuildId)-uitests.zip     # ToDo: Change/provide a name
             
           - task: Bash@3
             inputs:
