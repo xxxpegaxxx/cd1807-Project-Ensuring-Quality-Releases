@@ -215,8 +215,8 @@ stages:
   # ToDo: 
   - deployment: VMDeploy
     displayName: Selenium Tests
-    environment: project3_env
-      resourcename: linuxvm
+    environment:
+      name: project3_env
       resourceType: VirtualMachine
       #tags: selenium
     strategy:
