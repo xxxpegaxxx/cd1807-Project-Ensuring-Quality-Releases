@@ -9,9 +9,9 @@ from selenium.webdriver.common.by import By
 
 print ('Starting the browser...')
     # --uncomment when running in Azure DevOps.
-    # options = ChromeOptions()
-    # options.add_argument("--headless") 
-    # driver = webdriver.Chrome(options=options)
+     options = ChromeOptions()
+     options.add_argument("--headless") 
+     driver = webdriver.Chrome(options=options)
 
 user = 'standard_user'
 password = 'secret_sauce'
