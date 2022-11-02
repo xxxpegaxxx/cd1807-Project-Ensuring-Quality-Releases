@@ -10,6 +10,7 @@ from selenium.webdriver.common.by import By
 print ('Starting the browser...')
     # --uncomment when running in Azure DevOps.
 options = ChromeOptions()
+options.add_argument("--remote-debugging-port=9222")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--headless")
