@@ -250,14 +250,14 @@ stages:
               targetType: 'inline'
               script: |
                 unzip -o $(Pipeline.Workspace)/drop-uitests/$(Build.BuildId)-uitests.zip -d ./
-                mkdir -p ./log/selenium
-                python3 ./login.py 2>&1 | tee -a ./log/selenium/selenium-test-suite.log
+                mkdir -p /logs/selenium
+                python3 ./login.py 2>&1 | tee -a /logs/selenium/selenium-test-suite.log
                 ls -al
           - task: PublishPipelineArtifact@1
             displayName: Selenium Logs
             inputs:
               # targetPath: '$(System.DefaultWorkingDirectory)/log/selenium/selenium-test-suite.log'
-              targetPath: '/log/selenium/selenium-test-suite.log'
+              targetPath: '/logs/selenium/selenium-test-suite.log'
               artifact: drop-selenium-logs
               publishLocation: 'pipeline'
                 
