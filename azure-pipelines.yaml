@@ -252,7 +252,7 @@ stages:
                 unzip -o $(Pipeline.Workspace)/drop-uitests/$(Build.BuildId)-uitests.zip -d ./
                 mkdir -p ./log/selenium
                 python3 ./login.py 2>&1 | tee -a ./log/selenium/selenium-test-suite.log
-                sudo cp ./log/selenium/selenium-test-suite.log /logs/selenium/selenium-test-suite.log
+                sudo cp ./log/selenium/selenium-test-suite.log logs/selenium/selenium-test-suite.log
                 ls -al
           - task: PublishPipelineArtifact@1
             displayName: Selenium Logs
