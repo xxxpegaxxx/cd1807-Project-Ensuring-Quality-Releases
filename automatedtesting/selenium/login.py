@@ -1,4 +1,5 @@
 # #!/usr/bin/env python
+from logging import info
 from time import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
@@ -7,20 +8,30 @@ from selenium.webdriver.common.by import By
 
 # Start the browser and login with standard_user
 
+def start_browser(headless):
+    info('Starting the browser...')
+    chrome_options = webdriver.ChromeOptions()
+    if headless:
+        chrome_options.add_argument('--headless')
+    chrome_options.add_argument("--window-size=1440, 900");
+    driver = webdriver.Chrome(options=chrome_options)
+    info('Browser started successfully.')
+    return driver
+
 print ('Starting the browser...')
     # --uncomment when running in Azure DevOps.
-options = ChromeOptions()
-options.add_argument("--remote-debugging-port=9222")
-options.add_argument("--no-sandbox")
-options.add_argument("--disable-dev-shm-usage")
-options.add_argument("--headless")
-options.add_argument("start-maximized")
-options.add_argument("disable-infobars")
-options.add_argument("--disable-extensions")
-options.add_argument("--disable-gpu")
-options.binary_location = "/usr/bin/chromium-browser"
+#options = ChromeOptions()
+#options.add_argument("--remote-debugging-port=9222")
+#options.add_argument("--no-sandbox")
+#options.add_argument("--disable-dev-shm-usage")
+#options.add_argument("--headless")
+#options.add_argument("start-maximized")
+#options.add_argument("disable-infobars")
+#options.add_argument("--disable-extensions")
+#options.add_argument("--disable-gpu")
+#options.binary_location = "/usr/bin/chromium-browser"
 #driver = webdriver.Chrome('/path to ... /chromedriver',options=chrome_options)
-driver = webdriver.Chrome(options=options)
+#driver = webdriver.Chrome(options=options)
 
 user = 'standard_user'
 password = 'secret_sauce'
